@@ -2,12 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const connectDB = require('./config/db');
+const { connectDB } = require('./config/database');
 
 // Initialize app
 const app = express();
 
-// Connect to database
+// Connect to MySQL database
 connectDB();
 
 // Middleware

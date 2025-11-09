@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Transaction = require('../models/Transaction');
+const { Transaction } = require('../models');
 const { protect } = require('../middleware/authMiddleware');
 
 // All routes are protected
@@ -11,7 +11,10 @@ router.use(protect);
 // @access  Private
 router.get('/', async (req, res) => {
   try {
-    const transactions = await Transaction.find({ userId: req.user._id }).sort({ date: -1 });
+    const transactions = await Transaction.findAll({
+      where: { userId: req.user.id },
+      order: [['date', 'DESC']]
+    });
     res.json(transactions);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -23,14 +26,14 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.get('/:id', async (req, res) => {
   try {
-    const transaction = await Transaction.findById(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.id);
 
     if (!transaction) {
       return res.status(404).json({ message: 'Transaction not found' });
     }
 
     // Check if transaction belongs to user
-    if (transaction.userId.toString() !== req.user._id.toString()) {
+    if (transaction.userId !== req.user.id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
@@ -53,12 +56,12 @@ router.post('/', async (req, res) => {
     }
 
     const transaction = await Transaction.create({
-      userId: req.user._id,
+      userId: req.user.id,
       title,
       amount,
       category,
       type,
-      date: date || Date.now(),
+      date: date || new Date(),
     });
 
     res.status(201).json(transaction);
@@ -72,27 +75,28 @@ router.post('/', async (req, res) => {
 // @access  Private
 router.put('/:id', async (req, res) => {
   try {
-    const transaction = await Transaction.findById(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.id);
 
     if (!transaction) {
       return res.status(404).json({ message: 'Transaction not found' });
     }
 
     // Check if transaction belongs to user
-    if (transaction.userId.toString() !== req.user._id.toString()) {
+    if (transaction.userId !== req.user.id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
     const { title, amount, category, type, date } = req.body;
 
-    transaction.title = title || transaction.title;
-    transaction.amount = amount || transaction.amount;
-    transaction.category = category || transaction.category;
-    transaction.type = type || transaction.type;
-    transaction.date = date || transaction.date;
+    await transaction.update({
+      title: title || transaction.title,
+      amount: amount || transaction.amount,
+      category: category || transaction.category,
+      type: type || transaction.type,
+      date: date || transaction.date,
+    });
 
-    const updatedTransaction = await transaction.save();
-    res.json(updatedTransaction);
+    res.json(transaction);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -103,18 +107,18 @@ router.put('/:id', async (req, res) => {
 // @access  Private
 router.delete('/:id', async (req, res) => {
   try {
-    const transaction = await Transaction.findById(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.id);
 
     if (!transaction) {
       return res.status(404).json({ message: 'Transaction not found' });
     }
 
     // Check if transaction belongs to user
-    if (transaction.userId.toString() !== req.user._id.toString()) {
+    if (transaction.userId !== req.user.id) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    await transaction.deleteOne();
+    await transaction.destroy();
     res.json({ message: 'Transaction deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -126,7 +130,7 @@ router.delete('/:id', async (req, res) => {
 // @access  Private
 router.get('/stats/summary', async (req, res) => {
   try {
-    const transactions = await Transaction.find({ userId: req.user._id });
+    const transactions = await Transaction.findAll({ where: { userId: req.user.id } });
 
     const totalIncome = transactions
       .filter((t) => t.type === 'income')

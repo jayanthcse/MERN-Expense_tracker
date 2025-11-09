@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { User } = require('../models');
 const { protect } = require('../middleware/authMiddleware');
 
 // Generate JWT Token
@@ -28,7 +28,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user exists
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ where: { email } });
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
     }
@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
     });
 
     if (user) {
-      const token = generateToken(user._id);
+      const token = generateToken(user.id);
 
       // Set HTTP-only cookie
       res.cookie('token', token, {
@@ -52,7 +52,7 @@ router.post('/register', async (req, res) => {
       });
 
       res.status(201).json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         token,
@@ -78,10 +78,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ where: { email } });
 
     if (user && (await user.comparePassword(password))) {
-      const token = generateToken(user._id);
+      const token = generateToken(user.id);
 
       // Set HTTP-only cookie
       res.cookie('token', token, {
@@ -92,7 +92,7 @@ router.post('/login', async (req, res) => {
       });
 
       res.json({
-        _id: user._id,
+        id: user.id,
         name: user.name,
         email: user.email,
         token,
