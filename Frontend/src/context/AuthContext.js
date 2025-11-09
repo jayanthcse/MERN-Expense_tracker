@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Configure axios defaults
-  axios.defaults.baseURL = 'http://localhost:5000';
+  axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   axios.defaults.withCredentials = true;
 
   useEffect(() => {
