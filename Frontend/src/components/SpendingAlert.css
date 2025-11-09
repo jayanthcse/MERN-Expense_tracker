@@ -1,0 +1,125 @@
+.alert-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.alert-modal {
+  background-color: var(--bg-white);
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.alert-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-gray);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.alert-close:hover {
+  color: var(--text-dark);
+}
+
+.alert-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.alert-modal h2 {
+  font-size: 28px;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+}
+
+.alert-message {
+  font-size: 18px;
+  color: var(--text-dark);
+  margin-bottom: 12px;
+}
+
+.alert-message strong {
+  color: var(--warning);
+  font-size: 22px;
+}
+
+.alert-description {
+  font-size: 16px;
+  color: var(--text-gray);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.alert-progress {
+  width: 100%;
+  height: 12px;
+  background-color: var(--bg-light);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.alert-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+  transition: width 0.5s ease;
+  border-radius: 6px;
+}
+
+.alert-modal .btn {
+  padding: 12px 32px;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .alert-modal {
+    padding: 30px 20px;
+  }
+
+  .alert-modal h2 {
+    font-size: 24px;
+  }
+
+  .alert-message {
+    font-size: 16px;
+  }
+
+  .alert-description {
+    font-size: 14px;
+  }
+}
